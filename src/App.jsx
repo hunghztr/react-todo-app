@@ -2,18 +2,20 @@ import { useRef, useState } from "react";
 import "./App.css";
 import ToDoItem from "./components/ToDoItem";
 import Sidebar from "./components/Sidebar";
+import FilterPanel from "./components/FilterPanel";
 
 function App() {
   const inputRef = useRef(null);
   const [todoList, setTodoList] = useState([
-    { id: 1, name: "đi học thêm", isImportant: false, isCompleted: true },
-    { id: 2, name: "đi học chính", isImportant: true, isCompleted: false },
-    { id: 3, name: "đi học thêm", isImportant: false, isCompleted: false },
-    { id: 4, name: "đi học chính", isImportant: true, isCompleted: false },
+    { id: '1', name: "đi học thêm", isImportant: false, isCompleted: true ,isDeleted: false},
+    { id: '2', name: "đi học chính", isImportant: true, isCompleted: false ,isDeleted: false},
+    { id: '3', name: "đi học thêm", isImportant: false, isCompleted: false ,isDeleted: false},
+    { id: '4', name: "đi học chính", isImportant: true, isCompleted: false ,isDeleted: false},
   ]);
   const [showSidebar, setShowSidebar] = useState(false);
   const [idState, setIdState] = useState(0);
   const activeTodo = todoList.find((t) => t.id === idState);
+  const [selectedFilterState, setSelectedFilterState] = useState('all');
 
   const handleCancelSidebar = () => {
     setShowSidebar(false);
@@ -44,7 +46,13 @@ function App() {
     setShowSidebar(true);
   };
 
-  const todos = todoList.map((todo) => {
+  const todos = todoList.filter(i =>{
+    if(selectedFilterState === 'all') return true;
+    if(selectedFilterState === 'important') return i.isImportant;
+    if(selectedFilterState === 'completed') return i.isCompleted;
+    if(selectedFilterState === 'deleted') return i.isDeleted;
+    return false;
+  }).map((todo) => {
     return (
       <ToDoItem
         id={todo.id}
@@ -59,6 +67,8 @@ function App() {
   });
   return (
     <div className="container">
+      <FilterPanel todoList={todoList} selectedFilterState={selectedFilterState}  setSelectedFilterState={setSelectedFilterState}/>
+    <div className="main-content">
       <input
         ref={inputRef}
         type="text"
@@ -83,6 +93,7 @@ function App() {
       <div>{todos}</div>
       {showSidebar && <Sidebar key={idState} handleChangeTodo={handleChangeTodo}
        handleCancelSidebar={handleCancelSidebar} todoItem={activeTodo} />}
+    </div>
     </div>
   );
 }
