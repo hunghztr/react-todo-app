@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import './FilterPanel.css'; 
 
 const FILTER_ITEMS = [
@@ -23,14 +23,18 @@ const FILTER_ITEMS = [
         icon:'./deleted.png',
     },
 ]
-const FilterPanel = ({selectedFilterState,setSelectedFilterState,todoList}) => {
-    const countByFilter = todoList.reduce((acc, todo) => {
+const FilterPanel = ({selectedFilterState,setSelectedFilterState,todoList,searchText,setSearchText}) => {
+    console.log(searchText,setSearchText);
+    const countByFilter = useMemo( () =>{
+        return todoList.reduce((acc, todo) => {
         const newAcc = { ...acc };
         if (todo.isDeleted) {
             newAcc.deleted += 1;
-        } else if (todo.isCompleted) {
+        } 
+         if (todo.isCompleted) {
             newAcc.completed += 1;
-        } else if (todo.isImportant) {
+        } 
+         if (todo.isImportant) {
             newAcc.important += 1;
         } 
         return newAcc;
@@ -38,9 +42,9 @@ const FilterPanel = ({selectedFilterState,setSelectedFilterState,todoList}) => {
         important: 0,
         completed: 0,
         deleted: 0
-    });
+    })
+    },[todoList])
 
-    console.log(countByFilter);
     const filterItems = FILTER_ITEMS.map(i =>{
         return (
             <div key={i.id} className={`filter-item ${i.id === selectedFilterState ? 'selected' : ''}`}
@@ -57,7 +61,11 @@ const FilterPanel = ({selectedFilterState,setSelectedFilterState,todoList}) => {
     })
   return (
     <div className="filter-panel">
-      <input type="text" name="search-text" />
+      <input type="text" name="search-text" onKeyDown={(e) =>{
+        if(e.key === 'Enter'){
+            setSearchText(e.target.value);
+        }
+      }}/>
       <div className="filter-container">
         {filterItems}
       </div>

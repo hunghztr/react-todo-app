@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import "./App.css";
 import ToDoItem from "./components/ToDoItem";
 import Sidebar from "./components/Sidebar";
@@ -16,6 +16,7 @@ function App() {
   const [idState, setIdState] = useState(0);
   const activeTodo = todoList.find((t) => t.id === idState);
   const [selectedFilterState, setSelectedFilterState] = useState('all');
+  const [searchText,setSearchText] = useState('');
 
   const handleCancelSidebar = () => {
     setShowSidebar(false);
@@ -46,13 +47,19 @@ function App() {
     setShowSidebar(true);
   };
 
-  const todos = todoList.filter(i =>{
+  const todos = useMemo(() =>{
+    return todoList.filter(i =>{
+    if(!i.name.includes(searchText)){
+      return false;
+    }
     if(selectedFilterState === 'all') return true;
     if(selectedFilterState === 'important') return i.isImportant;
     if(selectedFilterState === 'completed') return i.isCompleted;
     if(selectedFilterState === 'deleted') return i.isDeleted;
-    return false;
-  }).map((todo) => {
+    return true;
+  })
+  },[todoList,selectedFilterState,searchText])
+  .map((todo) => {
     return (
       <ToDoItem
         id={todo.id}
@@ -67,7 +74,8 @@ function App() {
   });
   return (
     <div className="container">
-      <FilterPanel todoList={todoList} selectedFilterState={selectedFilterState}  setSelectedFilterState={setSelectedFilterState}/>
+      <FilterPanel searchText={searchText} setSearchText={setSearchText}
+       todoList={todoList} selectedFilterState={selectedFilterState}  setSelectedFilterState={setSelectedFilterState}/>
     <div className="main-content">
       <input
         ref={inputRef}
