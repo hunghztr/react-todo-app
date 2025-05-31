@@ -2,12 +2,15 @@
 import React, { useState } from "react";
 
 import "./Sidebar.css";
+import { CATEGORY_ITEMS } from "./constants";  
 const Sidebar = (props) => {
     const data = props.todoItem
     
     const [name, setName] = useState(data.name);
     const [isImportant, setIsImportant] = useState(data.isImportant);
     const [isCompleted, setIsCompleted] = useState(data.isCompleted);
+    const [category, setCategory] = useState(data.category);
+    console.log(category)
   return (
     <div className="sidebar">
       <form action="" className="sb-form">
@@ -33,6 +36,20 @@ const Sidebar = (props) => {
             setIsCompleted(!isCompleted);
           }}/>
         </div>
+        <div className="sb-form-field">
+          <label htmlFor="sb-category">Category</label>
+          <select name="" id="sb-category" onChange={(e) =>{
+            setCategory(e.target.value);
+          }}>
+              {CATEGORY_ITEMS.map( i =>{
+                return (
+                  <option value={i.id} key={i.id}>
+                    {i.label}
+                  </option>
+                );
+              })}
+          </select>
+        </div>
       </form>
       <div className="sb-footer">
             <button onClick={() => {
@@ -40,7 +57,8 @@ const Sidebar = (props) => {
                     id: data.id,
                     name: name,
                     isImportant: isImportant,
-                    isCompleted: isCompleted
+                    isCompleted: isCompleted,
+                    category: category,
                 }
                 props.handleChangeTodo(todo)}}
             >Save</button>

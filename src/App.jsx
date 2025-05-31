@@ -1,23 +1,17 @@
-import { useMemo, useRef, useState } from "react";
+import { useContext, useMemo, useRef } from "react";
 import "./App.css";
 import ToDoItem from "./components/ToDoItem";
 import Sidebar from "./components/Sidebar";
 import FilterPanel from "./components/FilterPanel";
+import { AppContext } from "./context/AppProvider";
 
 function App() {
   const inputRef = useRef(null);
-  const [todoList, setTodoList] = useState([
-    { id: '1', name: "đi học thêm", isImportant: false, isCompleted: true ,isDeleted: false},
-    { id: '2', name: "đi học chính", isImportant: true, isCompleted: false ,isDeleted: false},
-    { id: '3', name: "đi học thêm", isImportant: false, isCompleted: false ,isDeleted: false},
-    { id: '4', name: "đi học chính", isImportant: true, isCompleted: false ,isDeleted: false},
-  ]);
-  const [showSidebar, setShowSidebar] = useState(false);
-  const [idState, setIdState] = useState(0);
+  const { todoList, setTodoList } = useContext(AppContext);
+  const {showSidebar, setShowSidebar, idState, setIdState, selectedFilterState,
+     setSelectedFilterState, searchText, setSearchText,selectedCategoryId} = useContext(AppContext);
   const activeTodo = todoList.find((t) => t.id === idState);
-  const [selectedFilterState, setSelectedFilterState] = useState('all');
-  const [searchText,setSearchText] = useState('');
-
+  
   const handleCancelSidebar = () => {
     setShowSidebar(false);
   };
@@ -52,13 +46,16 @@ function App() {
     if(!i.name.includes(searchText)){
       return false;
     }
+    if(!i.category.includes(selectedCategoryId)){
+      return false;
+    }
     if(selectedFilterState === 'all') return true;
     if(selectedFilterState === 'important') return i.isImportant;
     if(selectedFilterState === 'completed') return i.isCompleted;
     if(selectedFilterState === 'deleted') return i.isDeleted;
     return true;
   })
-  },[todoList,selectedFilterState,searchText])
+  },[todoList,selectedFilterState,searchText,selectedCategoryId])
   .map((todo) => {
     return (
       <ToDoItem
@@ -92,6 +89,7 @@ function App() {
                 name: e.target.value,
                 isImportant: false,
                 isCompleted: false,
+                category: 'personal',
               },
             ]);
             inputRef.current.value = "";
